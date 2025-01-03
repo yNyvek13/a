@@ -5,7 +5,4 @@ hl.OutlineTransparency = 0
 
 for i, v in pairs(game["Players - Client"]:GetPlayers()) do
     hl:Clone().Parent = v.Character
-    if v.Name = "kevindarcico125" then
-        v.Character.Humanoid.Health = 150
-    end
 end
