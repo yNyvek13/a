@@ -1,9 +1,10 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
 local plr = game.Players.LocalPlayer
 local character = plr.Character or plr.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local UIS = game:GetService("UserInputService")
-
--- Atualização dos elementos da UI
 local Stats = plr:WaitForChild("PlayerStats")
 local style = Stats:WaitForChild("Style")
 local plrgui = plr:WaitForChild("PlayerGui")
@@ -12,6 +13,8 @@ local Background = plrgui:WaitForChild("Style").BG
 local desc = Background.Desc
 local txt = Background.StyleTxt
 local slot = Background.Slots.ScrollingFrame.Slot1
+local hasball = Workspace:FindFirstChild(plr).Values.HasBall
+local abilityCooldown = 0
 
 -- Atualização contínua dos elementos da UI
 while style.Value ~= "Kaiser" do
@@ -26,72 +29,92 @@ while style.Value ~= "Kaiser" do
     skills["2"].Timer.Text = "Godly Dribble"
 end
 
--- Função para Drible Rápido (Tecla V)
-local function DribleRapido()
-    -- Aumenta a velocidade do jogador
-    humanoid.WalkSpeed = 50
-
-    -- Distância para a pedalada (aumentada para ficar mais longo)
-    local pedalDistance = 40  -- Aumenta a distância da pedalada (agora mais longa)
-    local moveSpeed = 0.1    -- Reduz o tempo de espera para acelerar os movimentos (mais rápido)
-    local pedalCount = 10     -- Aumenta a quantidade de pedaladas para ter mais movimento (pedaladas mais longas)
-
-    -- Movimenta o personagem para a direita e esquerda com MoveTo
-    for i = 1, pedalCount do  -- Aumenta o número de movimentos para mais pedaladas
-        -- Alterna para a direita e esquerda com base na orientação do personagem
-        local rightVector = character.HumanoidRootPart.CFrame.RightVector
-        local leftVector = -rightVector
-
-        -- Move para a direita usando MoveTo
-        humanoid:MoveTo(character.HumanoidRootPart.Position + rightVector * pedalDistance)
-        wait(moveSpeed)
-        -- Move para a esquerda usando MoveTo
-        humanoid:MoveTo(character.HumanoidRootPart.Position + leftVector * pedalDistance)
-        wait(moveSpeed)
-    end
-
-    -- Movimentar para frente com MoveTo (aumentando a distância também)
-    local forwardPosition = character.HumanoidRootPart.Position + character.HumanoidRootPart.CFrame.LookVector * 30  -- Movimento para frente (agora 30 metros)
-    humanoid:MoveTo(forwardPosition)
-
-    -- Atraso para garantir que o drible rápido aconteça por um tempo
-    wait(2)  -- Tempo reduzido de espera após o drible
-    humanoid.WalkSpeed = 16 -- Retorna à velocidade normal
-end
-
-
 -- Função para Chute Hiper Forte (Tecla C)
 local function ChuteHiperForte()
-    -- Acessando a bola diretamente do Workspace (garanta que ela está lá)
-    local ball = game.Workspace:FindFirstChild("Football")
-    
+    -- Verifica se há a bola e se a habilidade não está em cooldown
+    if tick() < abilityCooldown then return end
+    if hasball.Value == false then return end
+
+    -- Configura o cooldown da habilidade
+    abilityCooldown = tick() + 40  -- Habilidade com cooldown de 40 segundos
+
+    -- Inicia o efeito visual da câmera (campo de visão)
+    local cameraTween = TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {FieldOfView = 95})
+    cameraTween:Play()
+    Debris:AddItem(cameraTween, 0.5)
+
+    -- Inicia animações do jogador e da bola
+    local chuteAnim = Instance.new("Animation")
+    chuteAnim.AnimationId = "rbxassetid://18723315763"  -- ID da animação de chute
+    local animTrack = humanoid:WaitForChild("Animator"):LoadAnimation(chuteAnim)
+    animTrack.Priority = Enum.AnimationPriority.Action4  -- Definindo a prioridade da animação para Action4
+    animTrack:Play()
+
+    -- Reproduz a animação da bola
+    local ball = game.Workspace:FindFirstChild("kevindarcico125").Football
     if ball then
-        -- Acelera a bola com a direção do jogador
-        ball.Velocity = character.HumanoidRootPart.CFrame.LookVector * 100  -- Chute com alta velocidade
-        ball.Parent = game.Workspace -- Garante que a bola está na Workspace
-
-        -- Efeito visual (Highlight piscante no jogador)
-        local highlight = Instance.new("Highlight")
-        highlight.Parent = character
-        highlight.FillColor = Color3.fromRGB(255, 215, 0)  -- Cor dourada
-        highlight.OutlineColor = Color3.fromRGB(255, 215, 0)
-        highlight.OutlineTransparency = 0.5
-        highlight.FillTransparency = 0.5
-        highlight.Enabled = true
-
-        -- Deletar o highlight após um tempo
-        wait(1)
-        highlight:Destroy()
-    else
-        warn("Football não encontrado no Workspace!") -- Aviso caso a bola não exista
+        local ballAnim = Instance.new("Animation")
+        ballAnim.AnimationId = "rbxassetid://18723315763"  -- ID da animação de chute da bola
+        local ballAnimTrack = ball:FindFirstChild("Humanoid"):WaitForChild("Animator"):LoadAnimation(ballAnim)
+        ballAnimTrack:Play()
     end
+
+    -- Efeito de câmera e animação de impacto (iluminação)
+    task.delay(0.835, function()
+        game.Lighting.ColorCorrection.Contrast = -10
+        game.Lighting.ColorCorrection.Saturation = -1
+        task.delay(0.05, function()
+            game.Lighting.ColorCorrection.Contrast = 10
+            game.Lighting.ColorCorrection.Saturation = -1
+        end)
+        task.delay(0.1, function()
+            game.Lighting.ColorCorrection.Contrast = 0.25
+            game.Lighting.ColorCorrection.Saturation = 0.5
+        end)
+        task.delay(0.25, function()
+            -- Resetando o estado da habilidade e câmera
+            local resetCameraTween = TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.7, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {FieldOfView = 70})
+            resetCameraTween:Play()
+            Debris:AddItem(resetCameraTween, 0.7)
+        end)
+    end)
+
+    -- Atraso para simular o chute após a animação
+    task.delay(0.5, function()
+        local ball = game.Workspace:FindFirstChild("kevindarcico125").Football
+        if ball then
+            -- Deslocar a bola ligeiramente para fora do jogador para garantir que não fique presa
+            ball.Position = character.HumanoidRootPart.Position + character.HumanoidRootPart.CFrame.LookVector * 2
+
+            -- Aplicando a física para a bola sair voando
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000)
+            bodyVelocity.Velocity = character.HumanoidRootPart.CFrame.LookVector * 300  -- Aumentando a força para maior distância
+            bodyVelocity.Parent = ball
+
+            -- Adicionando o som de chute com volume ajustado
+            local chuteSom = Instance.new("Sound")
+            chuteSom.SoundId = "rbxassetid://133670968984347"  -- ID do som de chute
+            chuteSom.Volume = 0.8  -- Ajustando o volume do som
+            chuteSom.Parent = ball
+            chuteSom:Play()
+
+            -- Deletar o som após ser reproduzido
+            chuteSom.Ended:Connect(function()
+                chuteSom:Destroy()
+            end)
+
+            -- Remover o BodyVelocity depois de algum tempo (ajustando para simular a física real)
+            task.delay(1, function()
+                bodyVelocity:Destroy()  -- Permite que a bola continue seu movimento natural após o tempo
+            end)
+        end
+    end)
 end
 
 -- Função para ativar as habilidades
 UIS.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.V then
-        DribleRapido()
-    elseif input.KeyCode == Enum.KeyCode.C then
+    if input.KeyCode == Enum.KeyCode.C then
         ChuteHiperForte()
     end
 end)
