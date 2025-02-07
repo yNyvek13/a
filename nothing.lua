@@ -1,3 +1,18 @@
+local plr = game.Players.LocalPlayer
+local character = plr.Character or plr.CharacterAdded:Wait() -- Corrigir a referência do jogador
+local humanoid = character:WaitForChild("Humanoid")
+local UIS = game:GetService("UserInputService")
+local Stats = plr:WaitForChild("PlayerStats") -- Certificando-se que PlayerStats existe
+local style = Stats:WaitForChild("Style")
+local plrgui = plr:WaitForChild("PlayerGui")
+local skills = plrgui:WaitForChild("InGameUI").Bottom.Abilities
+local Background = plrgui:WaitForChild("Style").BG
+local desc = Background.Desc
+local txt = Background.StyleTxt
+local slots = Background.Slots.ScrollingFrame
+local slot = slots.Slot1
+local rarities = Background.Rarities.ScrollingFrame
+
 while true do
     task.wait()
     style.Value = "Kaiser"
