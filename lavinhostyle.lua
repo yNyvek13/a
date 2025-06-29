@@ -29,7 +29,7 @@ skill3frame.Keybind.Text = "H"
 
 local uis = game:GetService("UserInputService")
 
-local isLocked = false -- Estado do toggle
+local isLocked = false
 
 local function toggleMouseLock()
 	isLocked = not isLocked
