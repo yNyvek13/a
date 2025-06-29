@@ -29,6 +29,20 @@ skill3frame.Keybind.Text = "H"
 
 local uis = game:GetService("UserInputService")
 
+local isLocked = false -- Estado do toggle
+
+local function toggleMouseLock()
+	isLocked = not isLocked
+
+	if isLocked then
+		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+		UserInputService.MouseIconEnabled = false
+	else
+		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+		UserInputService.MouseIconEnabled = true
+	end
+end
+
 uis.InputBegan:Connect(function(key, GPE)
     if GPE then return end
     if key.KeyCode == Enum.KeyCode.F then
@@ -253,5 +267,7 @@ uis.InputBegan:Connect(function(key, GPE)
                 attachment:Destroy()
             end
         end)
+    elseif key.KeyCode == Enum.KeyCode.LeftControl then
+        toggleMouseLock()
     end
 end)
