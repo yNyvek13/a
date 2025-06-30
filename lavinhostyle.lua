@@ -8,21 +8,21 @@ local skill3 = "Butterfly Dribble"
 local skill1frame = abilities["1"]:Clone()
 skill1frame.Timer:Destroy()
 skill1frame.Parent = abilities
-skill1frame.Name = 0.25
+skill1frame.Name = "0.1"
 skill1frame.ActualTimer.Text = skill1
 skill1frame.Cooldown:Destroy()
 skill1frame.Keybind.Text = "F"
 local skill2frame = abilities["1"]:Clone()
 skill2frame.Timer:Destroy()
 skill2frame.Parent = abilities
-skill2frame.Name = 0.25
+skill2frame.Name = "0.2"
 skill2frame.ActualTimer.Text = skill2
 skill2frame.Cooldown:Destroy()
 skill2frame.Keybind.Text = "Y"
 local skill3frame = abilities["1"]:Clone()
 skill3frame.Timer:Destroy()
 skill3frame.Parent = abilities
-skill3frame.Name = 0.25
+skill3frame.Name = "0.3"
 skill3frame.ActualTimer.Text = skill3
 skill3frame.Cooldown:Destroy()
 skill3frame.Keybind.Text = "H"
